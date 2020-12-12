@@ -1,0 +1,230 @@
+﻿###############################################################################
+#
+# IAR ELF Linker V8.30.1.114/W32 for ARM                  12/Dec/2020  18:31:58
+# Copyright 2007-2018 IAR Systems AB.
+#
+#    Output file  =  StackSmashingProtection.out
+#    Map file     =  map.map
+#    Command line =  
+#        -o StackSmashingProtection.out ../build_files/allsrc/main.o
+#        ../build_files/allsrc/stack_guard.o --map map --config
+#        generic_cortex.icf --enable_stack_usage
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__SystemLibrary = DLib
+__dlib_version  = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because some modules are built with
+size limitations (and not runtime checking), and --advanced_heap
+was not specified.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at 0x0 { ro section .intvec };
+"P1":  place in [from 0x0 to 0x7'ffff] { ro };
+define block CSTACK with size = 2K, alignment = 8 { };
+define block PROC_STACK with size = 0M, alignment = 8 { };
+define block HEAP with size = 0M, alignment = 8 { };
+"P2":  place in [from 0x2000'0000 to 0x2000'ffff] {
+          rw, block CSTACK, block PROC_STACK, block HEAP };
+initialize by copy { rw };
+
+  Section            Kind         Address   Size  Object
+  -------            ----         -------   ----  ------
+"A0":                                       0x40
+  .intvec            ro code          0x0   0x40  vector_table_M.o [3]
+                                   - 0x40   0x40
+
+"P1":                                      0x1bc
+  .text              ro code         0x40   0x70  main.o [1]
+  .text              ro code         0xb0    0x6  ABImemclr4.o [3]
+  .text              ro code         0xb6   0x3a  zero_init3.o [3]
+  .text              ro code         0xf0   0x10  stack_guard.o [1]
+  .text              ro code        0x100   0x32  ABImemset48.o [3]
+  .text              ro code        0x132   0x2c  copy_init3.o [3]
+  .text              ro code        0x15e    0x2  vector_table_M.o [3]
+  .text              ro code        0x160   0x28  data_init.o [3]
+  .iar.init_table    const          0x188   0x24  - Linker created -
+  .text              ro code        0x1ac   0x1e  cmain.o [3]
+  .text              ro code        0x1ca    0x4  low_level_init.o [2]
+  .text              ro code        0x1ce    0x4  exit.o [2]
+  .text              ro code        0x1d4    0xa  cexit.o [3]
+  .text              ro code        0x1e0    0xc  XXexit.o [3]
+  .text              ro code        0x1ec    0xc  cstartup_M.o [3]
+  Initializer bytes  const          0x1f8    0x4  <for P2-1>
+  .rodata            const          0x1fc    0x0  zero_init3.o [3]
+  .rodata            const          0x1fc    0x0  copy_init3.o [3]
+                                  - 0x1fc  0x1bc
+
+"P2", part 1 of 3:                           0x4
+  P2-1                        0x2000'0000    0x4  <Init block>
+    .data            inited   0x2000'0000    0x4  stack_guard.o [1]
+                            - 0x2000'0004    0x4
+
+"P2", part 2 of 3:                          0x50
+  .bss               zero     0x2000'0004   0x50  main.o [1]
+                            - 0x2000'0054   0x50
+
+"P2", part 3 of 3:                         0x800
+  CSTACK                      0x2000'0058  0x800  <Block>
+    CSTACK           uninit   0x2000'0058  0x800  <Block tail>
+                            - 0x2000'0858  0x800
+
+Unused ranges:
+
+         From           To      Size
+         ----           --      ----
+        0x1fc     0x7'ffff  0x7'fe04
+  0x2000'0054  0x2000'0057       0x4
+  0x2000'0858  0x2000'ffff    0xf7a8
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address      Size
+          -------      ----
+Zero (__iar_zero_init3)
+    1 destination range, total size 0x50:
+          0x2000'0004  0x50
+
+Copy (__iar_copy_init3)
+    1 source range, total size 0x4:
+                0x1f8   0x4
+    1 destination range, total size 0x4:
+          0x2000'0000   0x4
+
+
+*******************************************************************************
+*** STACK USAGE
+***
+
+  Call Graph Root Category  Max Use  Total Use
+  ------------------------  -------  ---------
+  interrupt                      0          0
+  Program entry                 80         80
+
+
+Program entry
+  "__iar_program_start": 0x1ed
+
+  Maximum call chain                               80  bytes
+
+    "__iar_program_start"                           0
+    "__cmain"                                       0
+    "main"                                          8
+    "BufferIncrement"                              64
+    "__aeabi_memclr4"                               0
+    "__iar_Memset4_word"                            4
+    "Enter8" in ABImemset48.o [3]                   4
+
+interrupt
+  "__default_handler" in vector_table_M.o [3]: 0x15f
+
+  Maximum call chain                                0  bytes
+
+    "__default_handler" in vector_table_M.o [3]     0
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module            ro code  ro data  rw data
+    ------            -------  -------  -------
+command line/config:
+    -------------------------------------------
+    Total:
+
+E:\StackSmashingProtection\build_files\allsrc: [1]
+    main.o                112                80
+    stack_guard.o          16        4        4
+    -------------------------------------------
+    Total:                128        4       84
+
+dl7M_tln.a: [2]
+    exit.o                  4
+    low_level_init.o        4
+    -------------------------------------------
+    Total:                  8
+
+rt7M_tl.a: [3]
+    ABImemclr4.o            6
+    ABImemset48.o          50
+    XXexit.o               12
+    cexit.o                10
+    cmain.o                30
+    copy_init3.o           44
+    cstartup_M.o           12
+    data_init.o            40
+    vector_table_M.o       66
+    zero_init3.o           58
+    -------------------------------------------
+    Total:                328
+
+    Gaps                    4
+    Linker created                  36    2 048
+-----------------------------------------------
+    Grand Total:          468       40    2 132
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                       Address  Size  Type      Object
+-----                       -------  ----  ----      ------
+.iar.init_table$$Base         0x188         --   Gb  - Linker created -
+.iar.init_table$$Limit        0x1ac         --   Gb  - Linker created -
+?main                         0x1ad        Code  Gb  cmain.o [3]
+BufferIncrement                0x59  0x4e  Code  Gb  main.o [1]
+CSTACK$$Base            0x2000'0058         --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'0858         --   Gb  - Linker created -
+Region$$Table$$Base           0x188         --   Gb  - Linker created -
+Region$$Table$$Limit          0x1ac         --   Gb  - Linker created -
+__aeabi_memclr4                0xb1        Code  Gb  ABImemclr4.o [3]
+__cmain                       0x1ad        Code  Gb  cmain.o [3]
+__exit                        0x1e1        Code  Gb  XXexit.o [3]
+__iar_Memset4_word            0x101        Code  Gb  ABImemset48.o [3]
+__iar_Memset8_word            0x101        Code  Gb  ABImemset48.o [3]
+__iar_copy_init3              0x133  0x2c  Code  Gb  copy_init3.o [3]
+__iar_data_init3              0x161  0x28  Code  Gb  data_init.o [3]
+__iar_program_start           0x1ed        Code  Gb  cstartup_M.o [3]
+__iar_zero_init3               0xb7  0x3a  Code  Gb  zero_init3.o [3]
+__low_level_init              0x1cb   0x4  Code  Gb  low_level_init.o [2]
+__stack_chk_fail               0xf1  0x10  Code  Gb  stack_guard.o [1]
+__stack_chk_guard       0x2000'0000   0x4  Data  Gb  stack_guard.o [1]
+__vector_table                  0x0        Data  Gb  vector_table_M.o [3]
+_call_main                    0x1b9        Code  Gb  cmain.o [3]
+_exit                         0x1d5        Code  Gb  cexit.o [3]
+_main                         0x1c7        Code  Gb  cmain.o [3]
+exit                          0x1cf   0x4  Code  Gb  exit.o [2]
+main                           0x41  0x18  Code  Gb  main.o [1]
+src                     0x2000'0004  0x50  Data  Lc  main.o [1]
+
+
+[1] = E:\StackSmashingProtection\build_files\allsrc
+[2] = dl7M_tln.a
+[3] = rt7M_tl.a
+
+    468 bytes of readonly  code memory
+     40 bytes of readonly  data memory
+  2 132 bytes of readwrite data memory
+
+Errors: none
+Warnings: none
